@@ -61,9 +61,9 @@ public class Kit {
             System.out.println("-----> coins resceived: " + tx.getTxId());
             System.out.println("received: " + tx.getValue(wallet));
             Address to = kit.wallet().parseAddress("tb1qeww9d68r9xyka203zpzmwmwc94rp8sqfgekhwn");
-            Coin value = tx.getValue(wallet);
+            Coin value = Coin.parseCoin("0.00001");
             org.bitcoinj.wallet.SendRequest req = org.bitcoinj.wallet.SendRequest.to(to, value);
-            req.setFeePerVkb(Coin.valueOf(1000));
+            req.setFeePerVkb(Coin.valueOf(1100));
             try {
                 Wallet.SendResult result = wallet.sendCoins(req);
                 System.out.println("coins sent. transaction hash: " + result.transaction().getTxId());

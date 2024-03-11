@@ -44,7 +44,7 @@ public class RestoreFromSeed {
         // HD wallets allow you to restore your wallet simply from a root seed. This seed can be represented using a short mnemonic sentence as described in BIP 39: https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki
 
         // Here we restore our wallet from a seed with no passphrase. Also have a look at the BackupToMnemonicSeed.java example that shows how to backup a wallet by creating a mnemonic sentence.
-        String seedCode = "yard impulse luxury drive today throw farm pepper survey wreck glass federal";
+        String seedCode = "prize blind exhibit spike learn busy appear stairs energy deputy steak omit";
         String passphrase = "";
         Instant creationtime = Instant.ofEpochSecond(1409478661L);
 

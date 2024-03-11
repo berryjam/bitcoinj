@@ -1,6 +1,6 @@
 /*
  * Copyright by the original author or authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,16 +16,19 @@
 
 package org.bitcoinj.examples;
 
+import org.bitcoinj.base.Address;
 import org.bitcoinj.base.BitcoinNetwork;
+import org.bitcoinj.base.Coin;
 import org.bitcoinj.core.*;
 import org.bitcoinj.kits.WalletAppKit;
+import org.bitcoinj.wallet.Wallet;
 
 import java.io.File;
 
 /**
  * The following example shows how to use the by bitcoinj provided WalletAppKit.
  * The WalletAppKit class wraps the boilerplate (Peers, BlockChain, BlockStorage, Wallet) needed to set up a new SPV bitcoinj app.
- * 
+ * <p>
  * In this example we also define a WalletEventListener class with implementors that are called when the wallet changes (for example sending/receiving money)
  */
 public class Kit {
@@ -57,6 +60,17 @@ public class Kit {
         kit.wallet().addCoinsReceivedEventListener((wallet, tx, prevBalance, newBalance) -> {
             System.out.println("-----> coins resceived: " + tx.getTxId());
             System.out.println("received: " + tx.getValue(wallet));
+            Address to = kit.wallet().parseAddress("tb1qeww9d68r9xyka203zpzmwmwc94rp8sqfgekhwn");
+            Coin value = tx.getValue(wallet);
+            org.bitcoinj.wallet.SendRequest req = org.bitcoinj.wallet.SendRequest.to(to, value);
+            req.setFeePerVkb(Coin.valueOf(1000));
+            try {
+                Wallet.SendResult result = wallet.sendCoins(req);
+                System.out.println("coins sent. transaction hash: " + result.transaction().getTxId());
+            } catch (InsufficientMoneyException e) {
+                System.out.println("Not enough coins in your wallet. Missing " + e.missing.getValue() + " satoshis are missing (including fees)");
+                System.out.println("Please send enough money to: " + wallet.currentReceiveAddress().toString());
+            }
         });
 
         kit.wallet().addCoinsSentEventListener((wallet, tx, prevBalance, newBalance) -> System.out.println("coins sent"));
@@ -73,12 +87,13 @@ public class Kit {
 
         // Ready to run. The kit syncs the blockchain and our wallet event listener gets notified when something happens.
         // To test everything we create and print a fresh receiving address. Send some coins to that address and see if everything works.
-        System.out.println("send money to: " + kit.wallet().freshReceiveAddress().toString());
+        System.out.println("send money to: " + kit.wallet().currentReceiveAddress().toString());
+//        System.out.println("send money to: " + kit.wallet().freshReceiveAddress().toString());
 
         // Make sure to properly shut down all the running services when you manually want to stop the kit. The WalletAppKit registers a runtime ShutdownHook so we actually do not need to worry about that when our application is stopping.
         //System.out.println("shutting down again");
-        //kit.stopAsync();
-        //kit.awaitTerminated();
+//        kit.stopAsync();
+        kit.awaitTerminated();
     }
 
 }

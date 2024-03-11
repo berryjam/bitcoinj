@@ -17,17 +17,20 @@
 
 package org.bitcoinj.examples;
 
+import org.bitcoinj.base.Address;
 import org.bitcoinj.base.BitcoinNetwork;
 import org.bitcoinj.base.Network;
 import org.bitcoinj.base.Sha256Hash;
 import org.bitcoinj.core.*;
 import org.bitcoinj.net.discovery.DnsDiscovery;
+import org.bitcoinj.script.Script;
 import org.bitcoinj.store.BlockStore;
 import org.bitcoinj.store.MemoryBlockStore;
 import org.bitcoinj.utils.BriefLogFormatter;
 import picocli.CommandLine;
 
 import java.net.InetAddress;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
@@ -76,7 +79,26 @@ public class FetchBlock implements Callable<Integer> {
         Future<Block> future = peer.getBlock(blockHash);
         System.out.println("Waiting for node to send us the requested block: " + blockHash);
         Block block = future.get();
-        System.out.println(block);
+
+        List<Transaction> txs = block.getTransactions();
+        for (Transaction tx: txs) {
+//            System.out.println("tx: " + tx);
+            if ("a13bbdad5bb8b2cdc3b4a28083f34e1701cd6cdcd43a01558f5ede241e156542".equals(tx.getTxId().toString())) {
+                System.out.println("tx: " + tx);
+                List<TransactionOutput> outputs = tx.getOutputs();
+                for(TransactionOutput output: outputs) {
+                    Transaction parent = output.getParentTransaction();
+//                    System.out.println("parent tx: " + parent);
+                    Script pubKey = output.getScriptPubKey();
+                    Address address = pubKey.getToAddress(network);
+                    if("tb1qeww9d68r9xyka203zpzmwmwc94rp8sqfgekhwn".equals(address.toString())) {
+                        System.out.printf("pubKey:%s address:%s receive: %s\n", pubKey, address, output.getValue().toFriendlyString());
+                    }
+                }
+            }
+        }
+
+//        System.out.println(block);
         peerGroup.stopAsync();
 
         return 0;

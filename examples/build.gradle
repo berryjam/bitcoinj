@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'application'
 }
 
 dependencies {
@@ -16,4 +17,8 @@ javadoc.options.encoding = 'UTF-8'
 compileJava {
     options.compilerArgs.addAll(['--release', '11'])
     options.compilerArgs << '-Xlint:deprecation'
+}
+
+application {
+    mainClassName = project.hasProperty("mainClass") ? project.getProperty("mainClass") : "NULL"
 }

@@ -3,6 +3,7 @@ import org.gradle.util.GradleVersion
 buildscript {
     repositories {
         mavenCentral()
+        google()
     }
     // If using Gradle 7, use the compatible protobuf plugin, else use the one that works with oldest supported Gradle
     boolean isGradle7 = GradleVersion.current().compareTo(GradleVersion.version("7.0")) >= 0
@@ -18,6 +19,7 @@ buildscript {
 allprojects {
     repositories {
         mavenCentral()
+        google()
     }
 
     group = 'org.bitcoinj'

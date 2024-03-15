@@ -17,11 +17,9 @@
 
 package org.bitcoinj.examples;
 
-import org.bitcoinj.base.Address;
-import org.bitcoinj.base.BitcoinNetwork;
-import org.bitcoinj.base.Network;
-import org.bitcoinj.base.Sha256Hash;
+import org.bitcoinj.base.*;
 import org.bitcoinj.core.*;
+import org.bitcoinj.crypto.ECKey;
 import org.bitcoinj.net.discovery.DnsDiscovery;
 import org.bitcoinj.script.Script;
 import org.bitcoinj.store.BlockStore;
@@ -29,7 +27,7 @@ import org.bitcoinj.store.MemoryBlockStore;
 import org.bitcoinj.utils.BriefLogFormatter;
 import picocli.CommandLine;
 
-import java.net.InetAddress;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -81,18 +79,24 @@ public class FetchBlock implements Callable<Integer> {
         Block block = future.get();
 
         List<Transaction> txs = block.getTransactions();
-        for (Transaction tx: txs) {
-//            System.out.println("tx: " + tx);
-            if ("a13bbdad5bb8b2cdc3b4a28083f34e1701cd6cdcd43a01558f5ede241e156542".equals(tx.getTxId().toString())) {
+        for (Transaction tx : txs) {
+            if ("910e4fa1e07a192a33986dc45c6857ff33391cabe0ff87e733fda7ea0f71379e".equals(tx.getTxId().toString())) {
                 System.out.println("tx: " + tx);
+                Address from = null;
+                for (TransactionInput input : tx.getInputs()) {
+                    byte[] publicKeyBytes = input.getWitness().getPush(1);
+                    // 创建一个 ECKey 对象并导入公钥
+                    ECKey ecKey = ECKey.fromPublicOnly(publicKeyBytes);
+
+                    // 将 ECKey 对象转换为 Bitcoin 地址
+                    from = ecKey.toAddress(ScriptType.P2WPKH, network); // 如果是测试网络，请改为 TestNetParams.get()
+                }
                 List<TransactionOutput> outputs = tx.getOutputs();
-                for(TransactionOutput output: outputs) {
-                    Transaction parent = output.getParentTransaction();
-//                    System.out.println("parent tx: " + parent);
+                for (TransactionOutput output : outputs) {
                     Script pubKey = output.getScriptPubKey();
-                    Address address = pubKey.getToAddress(network);
-                    if("tb1qeww9d68r9xyka203zpzmwmwc94rp8sqfgekhwn".equals(address.toString())) {
-                        System.out.printf("pubKey:%s address:%s receive: %s\n", pubKey, address, output.getValue().toFriendlyString());
+                    Address to = pubKey.getToAddress(network);
+                    if ("tb1qeww9d68r9xyka203zpzmwmwc94rp8sqfgekhwn".equals(to.toString())) {
+                        System.out.printf("from:%s to:%s receive: %s\n", from, to, output.getValue().toFriendlyString());
                     }
                 }
             }

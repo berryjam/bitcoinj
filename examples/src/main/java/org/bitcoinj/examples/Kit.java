@@ -24,6 +24,8 @@ import org.bitcoinj.kits.WalletAppKit;
 import org.bitcoinj.wallet.Wallet;
 
 import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
  * The following example shows how to use the by bitcoinj provided WalletAppKit.
@@ -47,6 +49,7 @@ public class Kit {
         // 
         // For more information have a look at: https://bitcoinj.github.io/testing and https://bitcoin.org/en/developer-examples#testing-applications
         BitcoinNetwork network = BitcoinNetwork.TESTNET;
+        Context.propagate(new Context());
 
         // Initialize and start a WalletAppKit. The kit handles all the boilerplate for us and is the easiest way to get everything up and running.
         // Look at the WalletAppKit documentation and its source to understand what's happening behind the scenes: https://github.com/bitcoinj/bitcoinj/blob/master/core/src/main/java/org/bitcoinj/kits/WalletAppKit.java
